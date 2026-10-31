@@ -1,0 +1,208 @@
+<title>Rack05 NTTTCP 雙機報告</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: lab-report sheet — verdict strip, KPI row, then evidence sections stacked; data in mono */
+:root{
+  --bg:#f3f5f8; --panel:#ffffff; --ink:#18202c; --muted:#5d6879; --line:#dde2ea; --grid:#e9edf3;
+  --accent:#2d55c4; --accent2:#7a8fd6; --accent-soft:#e6ecfb;
+  --ok:#1f8a5a; --ok-soft:#e1f3ea; --warn:#b36b00; --warn-soft:#fbf0dc; --bad:#c23a3a; --bad-soft:#fbe5e5; --info:#5d6879; --info-soft:#eceff4;
+  --f-display:"IBM Plex Sans Condensed","Noto Sans TC",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans","Noto Sans TC",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f141c; --panel:#171e29; --ink:#e4e9f1; --muted:#97a2b4; --line:#2a3443; --grid:#222b38;
+  --accent:#7d9bf0; --accent2:#4d64a8; --accent-soft:#1f2a45;
+  --ok:#4cc38a; --ok-soft:#173327; --warn:#e7a33e; --warn-soft:#3a2b12; --bad:#f07070; --bad-soft:#3d1c1e; --info:#97a2b4; --info-soft:#232c39; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f141c; --panel:#171e29; --ink:#e4e9f1; --muted:#97a2b4; --line:#2a3443; --grid:#222b38;
+  --accent:#7d9bf0; --accent2:#4d64a8; --accent-soft:#1f2a45;
+  --ok:#4cc38a; --ok-soft:#173327; --warn:#e7a33e; --warn-soft:#3a2b12; --bad:#f07070; --bad-soft:#3d1c1e; --info:#97a2b4; --info-soft:#232c39; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:.005em}
+h1{font-size:clamp(22px,3.2vw,30px);font-weight:700}
+h2{font-size:19px;font-weight:600}
+h3{font-size:15px;font-weight:600}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 24px;align-items:flex-end}
+header .ids{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--f-mono);font-size:12.5px;color:var(--muted)}
+header .ids b{color:var(--ink);font-weight:500}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 20px;min-width:0}
+.sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px;margin-bottom:14px}
+.verdict{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel)}
+.verdict>div{padding:14px 18px;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:4px;min-width:0}
+.verdict>div:first-child{border-left:0}
+.verdict .st{font-family:var(--f-display);font-weight:700;font-size:20px;display:flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:11.5px;font-weight:500;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.s-ok{color:var(--ok)} .s-warn{color:var(--warn)} .s-bad{color:var(--bad)} .s-info{color:var(--info)}
+.p-ok{background:var(--ok-soft);color:var(--ok)} .p-warn{background:var(--warn-soft);color:var(--warn)} .p-bad{background:var(--bad-soft);color:var(--bad)} .p-info{background:var(--info-soft);color:var(--info)}
+.bg-ok{background:var(--ok)} .bg-warn{background:var(--warn)} .bg-bad{background:var(--bad)} .bg-info{background:var(--info)}
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi .v{font-family:var(--f-mono);font-size:clamp(18px,4.6vw,24px);overflow-wrap:anywhere;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.2}
+.kpi .v small{font-size:13px;color:var(--muted);margin-left:3px}
+.kpi .d{font-size:12px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:22px}
+.findings{display:flex;flex-direction:column;gap:10px}
+.fd{display:grid;grid-template-columns:4px minmax(0,1fr);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.fd>.bar{width:4px}
+.fd>.body{padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.fd .top{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.fd .top h3{flex:1 1 260px}
+.fd p{margin:0}
+.fd ul{margin:0;padding-left:18px;color:var(--muted)}
+.fd .ev-sec h4{margin:6px 0 2px;font-size:12px;font-weight:600;letter-spacing:.02em}
+.fd .ev-sec.facts h4{color:var(--ok)} .fd .ev-sec.infer h4{color:var(--warn)} .fd .ev-sec.unk h4{color:var(--muted)}
+.fd .ev-sec ul{color:var(--ink);overflow-wrap:anywhere} .fd .ev-sec.unk ul{color:var(--muted)}
+.conf.c-y{background:var(--ok-soft);color:var(--ok)} .conf.c-n{background:var(--warn-soft);color:var(--warn)}
+.rawbox{margin-top:6px;border:1px solid var(--line);border-radius:6px;padding:6px 10px}
+.rawbox>summary{cursor:pointer;font-size:12.5px;font-weight:600}
+.raw{margin:8px 0 0}
+.raw figcaption{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);overflow-wrap:anywhere;margin-bottom:3px}
+.raw pre{margin:0;max-height:300px;overflow:auto;background:var(--info-soft);border-radius:4px;padding:8px;font-family:var(--f-mono);font-size:11.5px;line-height:1.5;white-space:pre}
+.raw .ln{display:inline-block;min-width:4.2ch;margin-right:1.2ch;color:var(--muted);text-align:right;user-select:none}
+.fd code,.ev code{font-family:var(--f-mono);font-size:12px;background:var(--info-soft);padding:1px 5px;border-radius:4px;word-break:break-word}
+.tl{position:relative;display:flex;flex-direction:column;gap:0;padding-left:4px}
+.tl .row{display:grid;grid-template-columns:62px 14px minmax(0,1fr);gap:10px;align-items:start;padding-block:6px}
+.tl .t{font-family:var(--f-mono);font-size:12.5px;color:var(--muted);text-align:right;padding-top:1px}
+.tl .m{position:relative;height:100%}
+.tl .m::before{content:"";position:absolute;left:6px;top:0;bottom:-12px;width:2px;background:var(--line)}
+.tl .row:last-child .m::before{display:none}
+.tl .m .dot{position:relative;margin-top:5px;left:1px}
+.tl .x{display:flex;flex-direction:column;gap:1px}
+.tl .x span{font-size:12.5px;color:var(--muted)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--f-mono);font-weight:500;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+td.n,th.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.chart{width:100%;display:block}
+.chart text{fill:var(--muted);font-family:var(--f-mono);font-size:11px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.stats3{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+.stats3>div{border-top:1px solid var(--line);padding-top:8px;display:flex;flex-direction:column}
+.stats3 .v{font-family:var(--f-mono);font-size:15px}
+.stats3 .k{font-size:12px;color:var(--muted)}
+.minis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.mini{border:1px solid var(--line);border-radius:6px;padding:10px 12px 6px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.mini .hd{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.mini .nm{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini .val{font-family:var(--f-mono);font-size:14px;white-space:nowrap}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.controls input,.controls select{font:inherit;font-size:13px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 10px;min-width:0}
+.controls input:focus-visible,.controls select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{font:inherit;font-size:12.5px;background:transparent;color:var(--muted);border:0;padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.matrix td:nth-child(2),.matrix td:nth-child(3){white-space:nowrap}
+.ev{font-size:13px;display:flex;flex-direction:column;gap:6px}
+.sbar{position:relative;height:6px;background:var(--grid);border-radius:3px;min-width:80px}
+.sbar i{position:absolute;top:0;bottom:0;background:var(--accent2);border-radius:3px}
+[hidden]{display:none!important}
+.stack{display:flex;flex-direction:column;gap:22px;min-width:0}
+.tabs{align-self:flex-start;max-width:100%;overflow-x:auto}
+.tabs button{padding:9px 18px;font-size:13.5px;white-space:nowrap}
+.cmp td:nth-child(2),.cmp td:nth-child(3){overflow-wrap:anywhere}
+.grp td{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--bg);padding-top:10px}
+footer{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px;overflow-wrap:anywhere}
+header .ids span{overflow-wrap:anywhere}
+@media (max-width:980px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.grid2{grid-template-columns:minmax(0,1fr)}.minis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.verdict{grid-template-columns:minmax(0,1fr)}.verdict>div{border-left:0;border-top:1px solid var(--line)}.verdict>div:first-child{border-top:0}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.stats3{grid-template-columns:repeat(2,minmax(0,1fr))}.minis{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+      <span class="eyebrow">NTTTCP Full-Duplex Bare-Metal · Rack05 OU02 · Log 分析</span>
+      <h1 id="title"></h1>
+      <div class="ids" id="ids"></div>
+    </div>
+    <div class="ids" id="vers"></div>
+  </header>
+
+  <nav class="seg tabs" id="tabs" aria-label="檢視"></nav>
+  <section class="verdict" id="verdict" aria-label="結論"></section>
+
+  <div id="view-slot" class="stack">
+  <section class="kpis" id="kpis" aria-label="關鍵指標"></section>
+
+  <section class="panel" aria-labelledby="h-find">
+    <div class="sec-head"><h2 id="h-find">異常與觀察</h2><span class="legend" id="sevlegend"></span></div>
+    <div class="findings" id="findings"></div>
+  </section>
+
+  <div class="grid2">
+    <section class="panel" aria-labelledby="h-tp">
+      <div class="sec-head"><h2 id="h-tp">各 Thread 吞吐量</h2>
+        <div class="seg" role="group" aria-label="方向"><button type="button" id="b-tx" aria-pressed="true">TX 送出</button><button type="button" id="b-rx" aria-pressed="false">RX 接收</button></div></div>
+      <svg class="chart" id="thr" viewBox="0 0 560 230" role="img" aria-label="96 個 thread 的 Mbps 長條圖"></svg>
+      <div class="stats3" id="thrstats"></div>
+      <p class="muted" style="margin:10px 0 0;font-size:12.5px">96 threads、warm-up / cool-down 各 2 秒、執行 21,600 秒，MTU 9014、電源計畫 High performance。單一 thread 最高與最低相差約 4 倍，加總頻寬穩定，屬 RSS 佇列分配不均，不影響判定。</p>
+    </section>
+    <section class="panel" aria-labelledby="h-tl">
+      <div class="sec-head"><h2 id="h-tl">測試時間軸</h2><span class="eyebrow">UTC · 2026-10-30</span></div>
+      <div class="tl" id="timeline"></div>
+    </section>
+  </div>
+
+  <section class="panel" aria-labelledby="h-mx">
+    <div class="sec-head"><h2 id="h-mx">Pretest / Posttest 檢查項目</h2><span class="muted" style="font-size:12.5px">比對前後結果，找出測試後才出現的變化</span></div>
+    <div class="tablewrap"><table class="matrix"><thead><tr><th>檢查項目</th><th>Pretest</th><th>Posttest</th><th>前後比對 / 說明</th></tr></thead><tbody id="matrix"></tbody></table></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-sn">
+    <div class="sec-head"><h2 id="h-sn">BMC 感測器（OOB 監控）</h2><span class="muted" style="font-size:12.5px" id="sn-sub"></span></div>
+    <div class="minis" id="minis"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-st">
+    <div class="sec-head"><h2 id="h-st">全部感測器統計</h2>
+      <div class="controls"><input id="q" type="search" placeholder="搜尋名稱，例如 SOC、FAN" aria-label="搜尋感測器"><select id="unit" aria-label="單位"><option value="">全部單位</option></select></div></div>
+    <div class="tablewrap"><table><thead><tr><th>感測器</th><th>單位</th><th class="n">筆數</th><th class="n">最小</th><th class="n">平均</th><th class="n">最大</th><th style="min-width:120px">範圍</th></tr></thead><tbody id="stbody"></tbody></table></div>
+  </section>
+
+</div>
+
+  <div id="view-cmp" class="stack" hidden>
+    <section class="panel" aria-labelledby="h-x">
+      <div class="sec-head"><h2 id="h-x">跨機交叉驗證</h2><span class="muted" style="font-size:12.5px">發送端的數字應該等於對端接收端的數字</span></div>
+      <div class="tablewrap"><table><thead><tr><th>方向</th><th class="n">發送端 Mbps</th><th class="n">接收端 Mbps</th><th class="n">差異</th><th class="n">總量 MB（送 / 收）</th><th>判定</th></tr></thead><tbody id="xrows"></tbody></table></div>
+    </section>
+    <div class="grid2">
+      <section class="panel" aria-labelledby="h-sc">
+        <div class="sec-head"><h2 id="h-sc">Thread 對 Thread</h2>
+          <div class="seg" role="group" aria-label="方向"><button type="button" id="c-a" aria-pressed="true">Slot2 TX ↔ Slot46 RX</button><button type="button" id="c-b" aria-pressed="false">Slot46 TX ↔ Slot2 RX</button></div></div>
+        <svg class="chart" id="scat" viewBox="0 0 400 300" role="img" aria-label="發送端與接收端各 thread 吞吐量散佈圖"></svg>
+        <div class="stats3" id="scatstats"></div>
+        <p class="muted" style="margin:10px 0 0;font-size:12.5px">每個點是同一個 thread index 在發送端與接收端的 Mbps。點落在虛線上代表兩端完全一致。</p>
+      </section>
+      <section class="panel" aria-labelledby="h-cf">
+        <div class="sec-head"><h2 id="h-cf">兩台差異重點</h2></div>
+        <div class="findings" id="cmpfind"></div>
+      </section>
+    </div>
+    <section class="panel" aria-labelledby="h-cr">
+      <div class="sec-head"><h2 id="h-cr">兩端指標對照</h2></div>
+      <div class="tablewrap"><table class="cmp"><thead><tr><th>指標</th><th>Slot2</th><th>Slot46</th><th>比較</th></tr></thead><tbody id="cmprows"></tbody></table></div>
+    </section>
+  </div>
+
+  <footer>
+    <span>資料來源：C4143-Scale_Rack05_OU02_Slot2_…_Complete.zip 與 …_Slot46_…_Complete.zip（各 461 個檔案）。</span>
+    <span>主要依據：Stress/Net_stress/sender.xml、receiver.xml、done.json；Pretest|Posttest/Summary-Invoke-Profile.log、Get-SystemEventsDiagnostics、cper、rackscm_sel_decode、pcietool、smartctl、csidiag、bladeskucheck、bmcclishell；backgroundmonitors/rackmanagersystemsensoroobmonitor_metrics.log。</span>
+  </footer>
+</div>
+
+<script>
+__APP__
+</script>
