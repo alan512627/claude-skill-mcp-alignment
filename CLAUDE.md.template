@@ -1,6 +1,0 @@
-# Personal skill repo
-
-My skills live in https://github.com/alan512627/claude-skill-mcp-alignment.git (branch main). One folder per skill (`<skill-name>/SKILL.md` + `scripts/`, `assets/`), indexed in README.md.
-
-- When I ask for a skill, or an analysis/workflow of mine is turned into a skill, save it to that repo: add the folder, add a line to the README Skills list, commit and push to main.
-- At the start of any new task that might relate to past work, first `git clone --depth 1` (or pull) that repo into a scratch folder, read the README index and the SKILL.md descriptions, and follow/adapt a relevant skill. Tell me which skill you used. If none fits, proceed normally.

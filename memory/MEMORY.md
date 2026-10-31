@@ -1,0 +1,2 @@
+- [Skill repo location](skill-repo-location.md) — GitHub repo alan512627/claude-skill-mcp-alignment holds all user skills
+- [Skill repo workflow](skill-repo-workflow.md) — save new skills there; check it first for related tasks
